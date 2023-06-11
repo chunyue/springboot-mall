@@ -1,16 +1,17 @@
 package com.chunyue.springbootmall.controller;
 
+import com.chunyue.springbootmall.dto.ProductRequest;
 import com.chunyue.springbootmall.model.Product;
 import com.chunyue.springbootmall.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
-public class ProductCOntroller {
+public class ProductController {
 
     @Autowired
     private ProductService productService;
@@ -22,6 +23,18 @@ public class ProductCOntroller {
         if(product != null){
             return ResponseEntity.status(HttpStatus.OK).body(product);
         } return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    }
+
+    @PostMapping("products")
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductRequest productRequest){
+        Integer productId = productService.createProduct(productRequest);
+
+        Product product = productService.getProductById(productId);
+
+        ResponseEntity<Product> responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(product);
+
+        return responseEntity;
 
     }
 }
