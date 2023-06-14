@@ -56,4 +56,12 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedproduct);
     }
+
+    @DeleteMapping("products/{productId}")
+    public ResponseEntity<?> delectByProductId(@PathVariable Integer productId){
+        productService.deleteByProductId(productId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
 }
