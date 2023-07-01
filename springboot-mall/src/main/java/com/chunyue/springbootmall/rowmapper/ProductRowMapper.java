@@ -19,7 +19,7 @@ public class ProductRowMapper implements RowMapper<Product> {
         String categoryStr = resultSet.getString("category");
         ProductCategory productCategory = ProductCategory.valueOf(categoryStr);
         product.setCategory(productCategory);
-        //product.setCategory(ProductCategory.valueOf(resultSet.getString("category")));
+        //等同於product.setCategory(ProductCategory.valueOf(resultSet.getString("category")));
 
         product.setImageUrl(resultSet.getString("image_url"));
         product.setPrice(resultSet.getInt("price"));
