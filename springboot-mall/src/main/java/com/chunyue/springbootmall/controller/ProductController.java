@@ -1,5 +1,6 @@
 package com.chunyue.springbootmall.controller;
 
+import com.chunyue.springbootmall.constant.ProductCategory;
 import com.chunyue.springbootmall.dto.ProductRequest;
 import com.chunyue.springbootmall.model.Product;
 import com.chunyue.springbootmall.service.ProductService;
@@ -18,9 +19,11 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(){
+    public ResponseEntity<List<Product>> getProducts(
+            @RequestParam(required = false) ProductCategory category
+            ){
 
-        List<Product> productList = productService.getProducts();
+        List<Product> productList = productService.getProducts(category);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }

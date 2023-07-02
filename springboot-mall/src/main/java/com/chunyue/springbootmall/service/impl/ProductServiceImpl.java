@@ -1,5 +1,6 @@
 package com.chunyue.springbootmall.service.impl;
 
+import com.chunyue.springbootmall.constant.ProductCategory;
 import com.chunyue.springbootmall.dao.ProductDao;
 import com.chunyue.springbootmall.dto.ProductRequest;
 import com.chunyue.springbootmall.model.Product;
@@ -17,9 +18,9 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public List<Product> getProducts() {
+    public List<Product> getProducts(ProductCategory category) {
 
-       List<Product> productList =  productDao.getProducts();
+       List<Product> productList =  productDao.getProducts(category);
         return productList;
     }
 
