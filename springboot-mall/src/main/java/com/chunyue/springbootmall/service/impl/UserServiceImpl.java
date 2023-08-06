@@ -4,11 +4,17 @@ import com.chunyue.springbootmall.dao.UserDao;
 import com.chunyue.springbootmall.dto.UserRegisterRequest;
 import com.chunyue.springbootmall.model.User;
 import com.chunyue.springbootmall.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class UserServiceImpl implements UserService {
+
+    private final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserDao userDao;
@@ -20,6 +26,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Integer register(UserRegisterRequest userRegisterRequest) {
+
+        User user = userDao.getUserByEmail(userRegisterRequest.getEmail());
+
+        if (user != null){
+            log.warn("該eamil {} 已被註冊", userRegisterRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
         return userDao.createUser(userRegisterRequest);
     }
 }
