@@ -1,6 +1,7 @@
 package com.chunyue.springbootmall.service.impl;
 
 import com.chunyue.springbootmall.dao.UserDao;
+import com.chunyue.springbootmall.dto.UserLoginRequest;
 import com.chunyue.springbootmall.dto.UserRegisterRequest;
 import com.chunyue.springbootmall.model.User;
 import com.chunyue.springbootmall.service.UserService;
@@ -22,6 +23,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Integer userId) {
         return userDao.getUserById(userId);
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+
+        if(user == null){
+            log.warn("該email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }else if(user.getPassword().equals(userLoginRequest.getPassword())){
+            return user;
+        }else{
+            log.warn("該帳號 {} 密碼有誤", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override
