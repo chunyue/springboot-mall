@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         if(user == null){
             log.warn("該email {} 尚未註冊", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        };
+        }
 
         //將前端傳來的密碼用MD5轉換
         String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
