@@ -60,7 +60,7 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public Product getProductById(Integer productId) {
         String sql = "select product_id, product_name, category, image_url, price, stock, description, created_date, last_modified_date " +
-                "from mall.product " +
+                "from product " +
                 "where product_id = :productId;";
 
         Map<String, Object> map = new HashMap<>();
@@ -79,7 +79,7 @@ public class ProductDaoImpl implements ProductDao {
 
         String sql = "INSERT INTO product(product_name, category, image_url, "+
                 "price, stock, description, created_date, last_modified_date) "+
-                "VALUE (:productName, :category, :imageUrl, :price, "+
+                "VALUES (:productName, :category, :imageUrl, :price, "+
                 ":stock, :description, :createDate, :lastModifiedDate)";
 
         Map<String, Object> map = new HashMap<>();
