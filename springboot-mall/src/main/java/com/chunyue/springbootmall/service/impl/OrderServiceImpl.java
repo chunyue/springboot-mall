@@ -4,10 +4,12 @@ import com.chunyue.springbootmall.dao.OrderDao;
 import com.chunyue.springbootmall.dao.ProductDao;
 import com.chunyue.springbootmall.dto.BuyItem;
 import com.chunyue.springbootmall.dto.CreateOrderRequest;
+import com.chunyue.springbootmall.model.Order;
 import com.chunyue.springbootmall.model.OrderItem;
 import com.chunyue.springbootmall.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ProductDao productDao;
 
+    @Transactional
     @Override
     public Integer createOrder(Integer userId, CreateOrderRequest createOrderRequest) {
         Integer totalAmount = 0;
@@ -47,4 +50,22 @@ public class OrderServiceImpl implements OrderService {
 
         return orderId;
     }
+
+    @Override
+    public Order getOrderById(Integer orderId) {
+        Order order = orderDao.getOrderById(orderId);
+
+
+        List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(orderId);
+
+        order.setOrderItemList(orderItemList);
+
+        return order;
+    }
+
+
+
+
+
+
 }
