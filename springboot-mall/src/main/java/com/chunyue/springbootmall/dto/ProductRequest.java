@@ -19,6 +19,11 @@ public class ProductRequest {
     @NotNull
     private Integer price;
 
+    @NotNull
+    private Integer stock;
+
+    private String description;
+
     public String getProductName() {
         return productName;
     }
@@ -66,9 +71,4 @@ public class ProductRequest {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    @NotNull
-    private Integer stock;
-
-    private String description;
 }
