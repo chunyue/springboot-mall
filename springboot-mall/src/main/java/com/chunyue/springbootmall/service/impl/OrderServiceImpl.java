@@ -5,6 +5,7 @@ import com.chunyue.springbootmall.dao.ProductDao;
 import com.chunyue.springbootmall.dao.UserDao;
 import com.chunyue.springbootmall.dto.BuyItem;
 import com.chunyue.springbootmall.dto.CreateOrderRequest;
+import com.chunyue.springbootmall.dto.QueryParams;
 import com.chunyue.springbootmall.model.Order;
 import com.chunyue.springbootmall.model.OrderItem;
 import com.chunyue.springbootmall.model.Product;
@@ -99,9 +100,20 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
+    @Override
+    public List<Order> getOrdersByUserId(Integer userId, QueryParams queryParams) {
+        List<Order> orderList = orderDao.getOrdersByUserId(userId, queryParams);
 
+        for (Order order: orderList){
+            List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(order.getOrderId());
+            order.setOrderItemList(orderItemList);
+        }
 
+        return orderList;
+    }
 
-
-
+    @Override
+    public Integer countOrders(Integer userId, QueryParams queryParams) {
+        return orderDao.countOrders(userId, queryParams);
+    }
 }

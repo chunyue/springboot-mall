@@ -1,6 +1,7 @@
 package com.chunyue.springbootmall.dao.impl;
 
 import com.chunyue.springbootmall.dao.OrderDao;
+import com.chunyue.springbootmall.dto.QueryParams;
 import com.chunyue.springbootmall.model.Order;
 import com.chunyue.springbootmall.model.OrderItem;
 import com.chunyue.springbootmall.rowmapper.OrderItemRowMapper;
@@ -97,5 +98,34 @@ public class OrderDaoImpl implements OrderDao {
             return orderItemListList;
     }
 
+    @Override
+    public List<Order> getOrdersByUserId(Integer userId, QueryParams queryParams) {
+        String sql = "SELECT order_id, user_id, total_amount, created_date, last_modified_date " +
+                "FROM `order` WHERE user_id = :userId ";
 
+        sql += "ORDER BY created_date DESC ";
+        sql += "LIMIT :limit OFFSET :offset";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("limit", queryParams.getLimit());
+        map.put("offset", queryParams.getOffset());
+
+        List<Order> OrderList = namedParameterJdbcTemplate.query(sql,map,new OrderRowMapper());
+
+        if (OrderList.size() > 0){
+            return OrderList;
+        }else {
+            return null;
+        }
+    }
+
+    public Integer countOrders(Integer userId, QueryParams queryParams) {
+        String sql = "SELECT count(*) FROM `order` WHERE user_id = :userId ";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+
+        return namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+    }
 }
