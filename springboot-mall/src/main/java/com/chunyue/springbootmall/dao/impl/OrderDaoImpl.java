@@ -26,7 +26,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Integer createOrder(Integer userId, Integer amount) {
-        String sql = "INSERT INTO `order` (user_id, total_amount, created_date, last_modified_date) " +
+        String sql = "INSERT INTO mall.\"order\" (user_id, total_amount, created_date, last_modified_date) " +
                 "VALUES (:userId, :totalAmount, :createdDate, :lastModifiedDate) ;";
 
         Map<String, Object> map = new HashMap<>();
@@ -47,7 +47,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public void createOrderItems(Integer orderId, List<OrderItem> orderItemList) {
-        String sql = "INSERT INTO order_item(order_id, product_id, quantity, amount) " +
+        String sql = "INSERT INTO mall.order_item(order_id, product_id, quantity, amount) " +
                 "VALUES (:orderId, :productId, :quantity, :amount) ;";
 
         MapSqlParameterSource[] parameterSources = new MapSqlParameterSource[orderItemList.size()];
@@ -69,7 +69,7 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public Order getOrderById(Integer orderId) {
         String sql = "SELECT order_id, user_id, total_amount, created_date, last_modified_date " +
-                "FROM `order` WHERE order_id = :orderId;";
+                "FROM mall.\"order\" WHERE order_id = :orderId;";
 
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", orderId);
@@ -87,8 +87,8 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public List<OrderItem> getOrderItemsByOrderId(Integer orderId) {
         String sql = "select oi.order_item_id, oi.order_id, oi.product_id, oi.quantity, oi.amount, p.product_name, p.image_url "
-                + "FROM order_item oi "
-                + "LEFT JOIN product p ON oi.product_id = p.product_id "
+                + "FROM mall.order_item oi "
+                + "LEFT JOIN mall.product p ON oi.product_id = p.product_id "
                 + "WHERE order_id = :orderId;";
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", orderId);
@@ -101,7 +101,7 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public List<Order> getOrdersByUserId(Integer userId, QueryParams queryParams) {
         String sql = "SELECT order_id, user_id, total_amount, created_date, last_modified_date " +
-                "FROM `order` WHERE user_id = :userId ";
+                "FROM mall.\"order\" WHERE user_id = :userId ";
 
         sql += "ORDER BY created_date DESC ";
         sql += "LIMIT :limit OFFSET :offset";
@@ -121,7 +121,7 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     public Integer countOrders(Integer userId, QueryParams queryParams) {
-        String sql = "SELECT count(*) FROM `order` WHERE user_id = :userId ";
+        String sql = "SELECT count(*) FROM mall.\"order\" WHERE user_id = :userId ";
 
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
