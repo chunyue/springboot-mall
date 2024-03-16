@@ -1,16 +1,14 @@
 package com.chunyue.springbootmall.dao.jpa;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.Optional;
+@Repository
+public interface DiscountEntityRepository extends JpaRepository<DiscountEntity, Long>, JpaSpecificationExecutor<DiscountEntity> {
+    Page<DiscountEntity> findAll(Specification specification, Pageable pageable);
 
-public interface DiscountEntityRepository extends JpaRepository<DiscountEntity, Long> {
-    Optional<DiscountEntity> findDiscountEntitiesByDiscountCodeLikeAndInnerCodeLikeAndStartedDateGreaterThanEqualAndEndDateLessThanEqual(
-            String discountCode,
-            String innerCode,
-            LocalDate startedDate,
-            LocalDate endDate
-    );
 }

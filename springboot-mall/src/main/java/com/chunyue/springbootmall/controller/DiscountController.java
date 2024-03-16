@@ -1,19 +1,24 @@
 package com.chunyue.springbootmall.controller;
 
 import com.chunyue.springbootmall.dao.jpa.DiscountEntity;
-import com.chunyue.springbootmall.dto.DiscountQueryRequest;
 import com.chunyue.springbootmall.service.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import javax.persistence.criteria.Predicate;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+@Validated
 @RestController
 public class DiscountController {
 
@@ -21,20 +26,29 @@ public class DiscountController {
     private DiscountService discountService;
 
     @GetMapping("/discountCodeRecords")
-    public ResponseEntity<List<DiscountEntity>> getDiscountCode(@RequestParam String discountCode,
-                                                                @RequestParam String innerCode,
-                                                                @RequestParam String startDate,
-                                                                @RequestParam String endedDate
+    public Page<DiscountEntity> getDiscountCode(@RequestParam(required = false)  String discountCode,
+                                                @RequestParam(required = false)  String innerCode,
+                                                @RequestParam(required = false)  String startDate,
+                                                @RequestParam(required = false)  String endedDate,
+                                                @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+                                                @RequestParam(name = "size", defaultValue = "10") int pageSize,
+                                                @RequestParam(name = "sort", defaultValue = "id", required = false) String sort
                                                                 ){
+        var spec =  Specification.<DiscountEntity>where((root, criteriaQuery,criteriaBuilder) -> {
+            var predicates = Stream.of(
+            Optional.ofNullable(discountCode).map(v -> criteriaBuilder.like(root.get("discountCode"),"%" + discountCode + "%")),
+            Optional.ofNullable(innerCode).map(v -> criteriaBuilder.like(root.get("discountCode"),"%" + innerCode + "%")),
+            Optional.ofNullable(startDate).map(v -> criteriaBuilder.greaterThanOrEqualTo(root.get("discountCode"),startDate)),
+            Optional.ofNullable(endedDate).map(v -> criteriaBuilder.greaterThanOrEqualTo(root.get("discountCode"),endedDate))
+            ).filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .toArray(Predicate[]::new);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startedDate = LocalDate.parse(startDate, formatter);
-        LocalDate endDate = LocalDate.parse(endedDate, formatter);
-        DiscountQueryRequest discountQueryRequest = new DiscountQueryRequest().builder()
-                .discountCode(discountCode).innerCode(innerCode).startedDate(startedDate).endDate(endDate).build();
-        List<DiscountEntity> discountEntity = discountService.getDiscountsByQueryParams(discountQueryRequest);
+            return criteriaBuilder.and(predicates);
+        });
 
-        return ResponseEntity.status(HttpStatus.OK).body(discountEntity);
+        Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by(sort));
 
+        return discountService.findAll(spec,pageable);
     }
 }
