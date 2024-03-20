@@ -3,6 +3,8 @@ package com.chunyue.springbootmall.service.impl;
 import com.chunyue.springbootmall.dao.OrderDao;
 import com.chunyue.springbootmall.dao.ProductDao;
 import com.chunyue.springbootmall.dao.UserDao;
+import com.chunyue.springbootmall.dao.jpa.DiscountEntityRepository;
+import com.chunyue.springbootmall.dao.jpa.InnerCodeRatioEntityRepository;
 import com.chunyue.springbootmall.dto.BuyItem;
 import com.chunyue.springbootmall.dto.CreateOrderRequest;
 import com.chunyue.springbootmall.dto.QueryParams;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private InnerCodeRatioEntityRepository innerCodeRatioEntityRepository;
+
+    @Autowired
+    private DiscountEntityRepository discountEntityRepository;
 
     @Transactional
     @Override
@@ -46,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        int totalAmount = 0;
+        BigDecimal totalAmount = BigDecimal.valueOf(0);
         List<OrderItem> orderItemList = new ArrayList<>();
 
 
@@ -68,10 +76,14 @@ public class OrderServiceImpl implements OrderService {
 
             productDao.updateStock(productId, product.getStock() - buyItem.getQuantity());
 
-            Integer productPrice = productDao.getProductById(productId).getPrice();
+            BigDecimal productPrice = productDao.getProductById(productId).getPrice();
 
-            int amount = buyItem.getQuantity() * productPrice;
-            totalAmount += amount;
+            if(!createOrderRequest.getDiscountCode().isEmpty()){
+                productPrice = productPrice.multiply(getDiscount(createOrderRequest.getDiscountCode()));
+            }
+
+            BigDecimal amount = BigDecimal.valueOf(buyItem.getQuantity()).multiply(productPrice);
+            totalAmount = totalAmount.add(amount);
 
             OrderItem orderItem = new OrderItem();
             orderItem.setProductId(productId);
@@ -115,5 +127,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Integer countOrders(Integer userId, QueryParams queryParams) {
         return orderDao.countOrders(userId, queryParams);
+    }
+
+    private BigDecimal getDiscount(String discountCode){
+        String innerCode = discountEntityRepository.findByDiscountCode(discountCode).getInnerCode();
+        return innerCodeRatioEntityRepository.findByInnerCode(innerCode).getDiscountRatio();
     }
 }

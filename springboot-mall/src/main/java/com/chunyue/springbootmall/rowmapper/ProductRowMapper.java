@@ -22,7 +22,7 @@ public class ProductRowMapper implements RowMapper<Product> {
         //等同於product.setCategory(ProductCategory.valueOf(resultSet.getString("category")));
 
         product.setImageUrl(resultSet.getString("image_url"));
-        product.setPrice(resultSet.getInt("price"));
+        product.setPrice(resultSet.getBigDecimal("price"));
         product.setStock(resultSet.getInt("stock"));
         product.setDescription(resultSet.getString("description"));
         product.setCreatedDate(resultSet.getTimestamp("created_date"));

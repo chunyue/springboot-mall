@@ -2,6 +2,7 @@ package com.chunyue.springbootmall.model;
 
 import com.chunyue.springbootmall.constant.ProductCategory;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Product {
@@ -10,7 +11,7 @@ public class Product {
     private String productName;
     private ProductCategory category;
     private String imageUrl;
-    private Integer price;
+    private BigDecimal price;
     private Integer stock;
     private String description;
     private Date createdDate;
@@ -48,11 +49,11 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public Integer getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

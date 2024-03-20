@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,7 @@ public class OrderDaoImpl implements OrderDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public Integer createOrder(Integer userId, Integer amount) {
+    public Integer createOrder(Integer userId, BigDecimal amount) {
         String sql = "INSERT INTO mall.\"order\" (user_id, total_amount, created_date, last_modified_date) " +
                 "VALUES (:userId, :totalAmount, :createdDate, :lastModifiedDate) ;";
 
@@ -40,9 +41,9 @@ public class OrderDaoImpl implements OrderDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(map), keyHolder);
-        int orderId = keyHolder.getKey().intValue();
+        var id = keyHolder.getKeyList().get(0).get("order_id");
 
-        return  orderId;
+        return Integer.parseInt(id.toString());
     }
 
     @Override
