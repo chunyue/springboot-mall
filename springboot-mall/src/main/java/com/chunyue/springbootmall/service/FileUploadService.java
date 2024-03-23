@@ -32,22 +32,13 @@ public class FileUploadService {
         String rootpath = fileUploadProperties.getRootPath();
 
         //檢查上傳的檔案是否為空
-        if(imageFile.isEmpty() || Objects.isNull(imageFile.getOriginalFilename())){
-            throw new IllegalArgumentException();
-        }
+        isFileEmpty(imageFile);
 
         //把絕對路徑先找出來，放在Path物件 （parent path）
-        String fileDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy" + File.separator + "MM" + File.separator + "dd"));
-        Path parePath = Paths.get(rootpath,fileDir);
-        log.info("儲存檔案至： " + parePath + "資料夾中");
+        Path parePath = getParePath(rootpath);
 
         //解析出檔名, 1-UUID-檔名加密
-        String endoceFileName = Id.toString()
-                + "-"
-                + UUID.randomUUID().toString().replace("-","")
-                + "-"
-                + Base64.getUrlEncoder().encodeToString(imageFile.getOriginalFilename().getBytes(StandardCharsets.UTF_8));
-        Path wholePath = parePath.resolve(endoceFileName);
+        Path wholePath = getWholePath(Id, imageFile, parePath);
 
         //此方法會檢查父層資料夾是否存在，如果不存在就創建，存在的話 也不會報錯
         Files.createDirectories(parePath);
@@ -56,6 +47,28 @@ public class FileUploadService {
         //用URL的加密方法，給這個檔案一個關聯用的名稱存到DB
         return URLEncoder.encode(wholePath.toString().replace(File.separator,"_"),StandardCharsets.UTF_8);
 
+    }
+
+    private void isFileEmpty(MultipartFile imageFile) {
+        if(imageFile.isEmpty() || Objects.isNull(imageFile.getOriginalFilename())){
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private Path getParePath(String rootpath) {
+        String fileDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy" + File.separator + "MM" + File.separator + "dd"));
+        Path parePath = Paths.get(rootpath,fileDir);
+        log.info("儲存檔案至： " + parePath + "資料夾中");
+        return parePath;
+    }
+
+    private Path getWholePath(Long Id, MultipartFile imageFile, Path parePath) {
+        String endoceFileName = Id.toString()
+                + "-"
+                + UUID.randomUUID().toString().replace("-","")
+                + "-"
+                + Base64.getUrlEncoder().encodeToString(imageFile.getOriginalFilename().getBytes(StandardCharsets.UTF_8));
+        return parePath.resolve(endoceFileName);
     }
 
 
