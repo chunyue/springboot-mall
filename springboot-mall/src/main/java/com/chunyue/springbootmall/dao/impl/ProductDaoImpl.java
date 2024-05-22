@@ -100,9 +100,9 @@ public class ProductDaoImpl implements ProductDao {
 
         namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(map), keyHolder);
 
-        int productId = keyHolder.getKey().intValue();
+        var productId = keyHolder.getKeyList().get(0).get("product_id");
 
-        return productId;
+        return Integer.parseInt(productId.toString());
     }
 
     @Override
