@@ -1,15 +1,20 @@
 package com.chunyue.springbootmall.service;
 
 import com.chunyue.springbootmall.configuration.FileUploadProperties;
+import com.chunyue.springbootmall.model.ResourceDetails;
+import io.github.classgraph.Resource;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -47,6 +52,17 @@ public class FileUploadService {
         //用URL的加密方法，給這個檔案一個關聯用的名稱存到DB
         return URLEncoder.encode(wholePath.toString().replace(File.separator,"_"),StandardCharsets.UTF_8);
 
+    }
+
+    public ResourceDetails getImageResource(String path){
+        String fileLocation = URLDecoder.decode(path,StandardCharsets.UTF_8).replace("_", File.separator);
+        String fileNameEnc = fileLocation.substring(fileLocation.lastIndexOf(File.separator) + 1);
+        var fileName = fileNameEnc.split("-");
+        int lastCount = fileName.length - 1;
+        String originalFileNameEncoded = fileName[lastCount];
+        String originalFileName = new String(Base64.getUrlDecoder().decode(originalFileNameEncoded),StandardCharsets.UTF_8);
+        FileSystemResource fileSystemResource = new FileSystemResource(fileLocation);
+        return ResourceDetails.builder().resource(fileSystemResource).fileName(originalFileName).build();
     }
 
     private void isFileEmpty(MultipartFile imageFile) {
