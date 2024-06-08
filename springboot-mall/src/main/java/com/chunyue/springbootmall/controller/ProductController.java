@@ -6,6 +6,7 @@ import com.chunyue.springbootmall.dto.ProductRequest;
 import com.chunyue.springbootmall.model.Product;
 import com.chunyue.springbootmall.service.ProductService;
 import com.chunyue.springbootmall.util.Page;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Operation(summary = "取得多筆產品資訊", description = "根據條件取得多筆產品資訊")
     @GetMapping("/products")
     public ResponseEntity<Page<Product>> getProducts(
             @RequestParam(required = false) ProductCategory category,
@@ -58,6 +60,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
+    @Operation(summary = "取得產品資訊", description = "根據產品ID取得產品資訊")
     @GetMapping("/products/{productId}")
     public ResponseEntity<Product> getProduct(@PathVariable Integer productId){
         Product product = productService.getProductById(productId);
@@ -68,6 +71,7 @@ public class ProductController {
 
     }
 
+    @Operation(summary = "新增一筆產品資訊", description = "新增產品（名稱、類別、圖片、價錢、庫存、描述）")
     @PostMapping("/products")
     public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductRequest productRequest){
         Integer productId = productService.createProduct(productRequest);
@@ -80,10 +84,10 @@ public class ProductController {
 
     }
 
+    @Operation(summary = "更新產品資訊", description = "更新產品名稱、類別、價錢、庫存、描述")
     @PutMapping("/products/{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
                                                  @RequestBody @Valid ProductRequest productRequest){
-
         //檢查商品是否已存在，若不存在回傳404給前端
         Product product = productService.getProductById(productId);
 
@@ -99,6 +103,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedproduct);
     }
 
+    @Operation(summary = "刪除單筆產品", description = "根據ID刪除產品")
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<?> delectByProductId(@PathVariable Integer productId){
         productService.deleteByProductId(productId);
