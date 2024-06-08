@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -33,13 +34,38 @@ public class FileUploadController {
                     )
             })})
     @PostMapping("product/{productId}/upload")
-    public String uploadImage(@PathVariable Long productId, @RequestPart MultipartFile file) throws IOException {
-        return fileUploadService.uploadImage(productId,file);
+    public String uploadImage(@PathVariable String productId, @RequestPart MultipartFile file) throws IOException {
+        long productIdParseLong;
+
+        //  檢查輸入的id是否為數字
+        if(checkIsNumber(productId)){
+            productIdParseLong = Long.parseLong(productId);
+        }else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid product ID: " + productId);
+        }
+
+        // 檢查文件是否為空
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
+        }
+        return fileUploadService.uploadImage(productIdParseLong,file);
     }
 
     @PostMapping("product/image")
     public ResourceDetails getImageResource(@RequestBody String path) {
 
         return fileUploadService.getImageResource(path);
+    }
+
+    private boolean checkIsNumber(String stringInput){
+        if (stringInput == null || "".equals(stringInput)){
+            return false;
+        }
+        for(char c : stringInput.toCharArray()){
+            if(!Character.isDigit(c)){
+                return false;
+            }
+        }
+        return true;
     }
 }
